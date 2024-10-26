@@ -1,59 +1,59 @@
-// Get the active tab URL and check if it's a SHEIN page
+// No need for DOMContentLoaded event listener here; code will run immediately
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-  let url = tabs[0].url;
+    let url = tabs[0].url;
+  
+    if (url.includes("shein.com")) {
+        // Delay requesting the page source by 200 milliseconds
+        setTimeout(() => {
+            chrome.runtime.sendMessage({ action: "getPageSource" }, (response) => {
+                if (response && response.source) {
+                    let data = response.source;
+                    let thredUpUrl = recommendationLogic(data);
+                    document.getElementById("recommendation").innerHTML = 
+                      `<a href="${thredUpUrl}" target="_blank">Check out similar items on ThredUp!</a>`;
+                } else {
+                    document.getElementById("recommendation").textContent = "Page source not found.";
+                }
+            });
+        }, 200); // Delay of 200 milliseconds
+    } 
+  });  
 
-  if (url.includes("shein.com")) {
-      // Call a function to handle the SHEIN recommendation logic
-
-
-      document.addEventListener("DOMContentLoaded", () => {
-        // Request the stored page source from the background script
-        chrome.runtime.sendMessage({ action: "getPageSource" }, (response) => {
-          if (response && response.source) {
-            data = response.source;
-            thredUpUrl = recommendationLogic(data);
-            document.getElementById("recommendation").innerHTML = 
-          `<a href="${thredUpUrl}" target="_blank">Check out similar items on ThredUp!</a>`;
-          } else {
-            document.getElementById("source").textContent = "Page source not found.";
-          }
-        });
-      });          
-  } 
-  else {
-      document.getElementById("recommendation").innerHTML = 
-          "You are not on a SHEIN page.";
-  }
-});
 
 function recommendationLogic(data) {
   
-let beginProductDetails = data.indexOf('"productDetails": [{attr_id');
-let endProductDetails = data.indexOf('attr_image":""}');
-let descriptionStr = data.substring(beginProductDetails, endProductDetails);
+// let beginProductDetails = data.indexOf('"productDetails": [{attr_id');
+// let endProductDetails = data.indexOf('attr_image":""}');
+// let descriptionStr = data.substring(beginProductDetails, endProductDetails);
 
-let colorStart = descriptionStr.indexOf('"attr_name":"Color"');
-let colorEnd = descriptionStr.indexOf('"attr_name":"Style"');
-let colorSubstring = descriptionStr.substring(colorStart, colorEnd);
-let colorValue = colorSubstring.substring(116, 119);
+let colorStart = data.indexOf('span class="sub-title" data-v');
+//let colorStart = data.indexOf("Color");
+//let colorStart = data.indexOf('Color</span><span class="sub-title" data-v-6939c68d>:');
+//console.log("COLOR START: " + colorStart);
+let colorEnd = data.indexOf('</span></div><div class="goods-color__title-link-box');
+//console.log("COLOR END: " + colorEnd);
+//console.log(data.substring(colorEnd - 10, colorEnd));
+let colorSubstring = data.substring(colorStart, colorEnd);
+//console.log("COLORSUBSTRING STARTS HERE: " + colorSubstring + " COLORSUBSTRING ENDS HERE");
+//let colorValue = colorSubstring.substring(116, 119);
 
 
-let patternTypeStart = descriptionStr.indexOf('"attr_name":"Pattern Type"');
-let patternTypeEnd = descriptionStr.indexOf('"attr_name":"Details"');
-let patternTypeSubstring = descriptionStr.substring(patternTypeStart, patternTypeEnd);
-let patternTypeValue = patternTypeSubstring.substring(131, 134);
+// let patternTypeStart = descriptionStr.indexOf('"attr_name":"Pattern Type"');
+// let patternTypeEnd = descriptionStr.indexOf('"attr_name":"Details"');
+// let patternTypeSubstring = descriptionStr.substring(patternTypeStart, patternTypeEnd);
+// let patternTypeValue = patternTypeSubstring.substring(131, 134);
 
 
-let sleeveLengthStart;
-let sleeveLengthEnd;
-let sleeveLengthSubstring;
-let sleeveLengthValue;
-if (descriptionStr.indexOf('"attr_name": "Sleeve Length"') != -1) {
-    sleeveLengthStart = descriptionStr.indexOf('"attr_name":"Sleeve Length"');
-    sleeveLengthEnd = descriptionStr.indexOf('"attr_name":"Sleeve Type"');
-    sleeveLengthSubstring = descriptionStr.substring(sleeveLengthStart, sleeveLengthEnd);
-    sleeveLengthValue = sleeveLengthSubstring.substring(133, 136);
-}
+// let sleeveLengthStart;
+// let sleeveLengthEnd;
+// let sleeveLengthSubstring;
+// let sleeveLengthValue;
+// if (descriptionStr.indexOf('"attr_name": "Sleeve Length"') != -1) {
+//     sleeveLengthStart = descriptionStr.indexOf('"attr_name":"Sleeve Length"');
+//     sleeveLengthEnd = descriptionStr.indexOf('"attr_name":"Sleeve Type"');
+//     sleeveLengthSubstring = descriptionStr.substring(sleeveLengthStart, sleeveLengthEnd);
+//     sleeveLengthValue = sleeveLengthSubstring.substring(133, 136);
+// }
 
 
 /*let quantityStart = descriptionStr.indexOf('"productDetails":[{"attr_id":1000411,"attr_value_id":"1002451","attr_name":"') + 76;
@@ -77,8 +77,9 @@ let titleStart = data.indexOf('<title>') + 7;
 let titleEnd = data.indexOf('</title>')
 let titleSubstring = data.substring(titleStart, titleEnd);
 
+console.log(titleSubstring); // works; SHEIN EZwear Solid Kangaroo Pocket Thermal Lined Hoodie | SHEIN USA
 
-const categories = ['Hoodie', 'Top', 'Dress', 'Coat', 'Jacket', 'Leggings', 'Sports Bra', 'Swimsuit', 'Coverup', 'Cover Up', 'Clutch', 'Tote', 'Purse', 'Handbag', 'Necklace', 'Earring', 'Ring', 'Headband', 'Belt', 'Heels', 'Sneakers', 'Boots', 'Pumps', 'Sandals', 'Tank Top', 'Sweatshirt', 'T-shirt', 'Tee', 'Sweaters', 'Jeans', 'Pants', 'Skirt', 'Shorts', 'Accessory'];
+const categories = ['Hoodie', 'Top', 'Dress', 'Coat', 'Jacket', 'Leggings', 'Sports Bra', 'Swimsuit', 'Coverup', 'Cover Up', 'Clutch', 'Tote', 'Purse', 'Handbag', 'Necklace', 'Earring', 'Ring', 'Bracelet', 'Headband', 'Belt', 'Heels', 'Sneakers', 'Boots', 'Pumps', 'Sandals', 'Tank Top', 'Sweatshirt', 'T-shirt', 'Tee', 'Sweaters', 'Jeans', 'Pants', 'Skirt', 'Shorts', 'Accessory'];
 
 let category;
 
@@ -89,145 +90,168 @@ while (categories[i]) {
     categorySearch = titleSubstring.search(categories[i]);
     if (categorySearch != -1) {
         category = categories[i];
+        break;
+    }
+    else {
+        category = "";
     }
     i++;
 }
+console.log(category); // works
 
 
 let fixedCategory;
 
-if (category == 'Dress') {
+if ((category.toLowerCase().includes('dress'))) {
     fixedCategory = 'Dresses';
 }
-else if ((category == 'Hoodie') || (category == 'Top') || (category == 'Tank Top') || (category == 'Sweatshirt') || (category == 'T-shirt') || (category == 'Tee')) {
+else if ((category.toLowerCase().includes('hoodie')) || (category.toLowerCase().includes('top')) || (category.toLowerCase().includes('tank')) || (category.toLowerCase().includes('sweatshirt')) || (category.toLowerCase().includes('t-shirt')) || (category.toLowerCase().includes('tee'))) {
     fixedCategory = 'Tops';
 }
-else if ((category == 'Coat') || (category == 'Jacket')) {
+else if ((category.toLowerCase().includes('coat')) || (category.toLowerCase().includes('jacket'))) {
     fixedCategory = 'Coats & Jackets';
 }
-else if ((category == 'Leggings') || (category == 'Sports Bra')) {
+else if ((category.toLowerCase().includes('leggings')) || (category.toLowerCase().includes('sports bra'))) {
     fixedCategory = 'Activewear';
 }
-else if ((category == 'Bikini') || (category == 'Swimsuit') || (category == 'Coverup') || (category == 'Cover Up')) {
+else if ((category.toLowerCase().includes('bikini')) || (category.toLowerCase().includes('swimsuit')) || (category.toLowerCase().includes('coverup')) || (category.toLowerCase().includes('cover up'))) {
     fixedCategory = 'Swimwear';
 }
-else if ((category == 'Clutch') || (category == 'Tote') || (category == 'Purse')) {
+else if ((category.toLowerCase().includes('clutch')) || (category.toLowerCase().includes('Tote')) || (category.toLowerCase().includes('purse'))) {
     fixedCategory = 'Handbags';
 }
-else if ((category == 'Necklace') || (category == 'Accessory') || (category == 'Bracelet') || (category == 'Earring') || (category == 'Ring') || (category == 'Headband') || (category == 'Belt')) {
+else if ((category.toLowerCase().includes('necklace')) || (category.toLowerCase().includes('accessory')) || (category.toLowerCase().includes('bracelet')) || (category.toLowerCase().includes('earring')) || (category.toLowerCase().includes('ring')) || (category.toLowerCase().includes('headband')) || (category.toLowerCase().includes('belt'))) {
     fixedCategory = 'Accessories';
 }
-else if ((category == 'Heel') || (category == 'Sneakers') || (category == 'Boot') || (category == 'Pump') || (category == 'Sandal')) {
+else if ((category.toLowerCase().includes('heel')) || (category.toLowerCase().includes('sneakers')) || (category.toLowerCase().includes('boot')) || (category.toLowerCase().includes('pump')) || (category.toLowerCase().includes('sandal'))) {
     fixedCategory = 'Shoes';
 }
 else {
-fixedCategory = category;
+    fixedCategory = "";
 }
 
+console.log(fixedCategory); // works
 
 let fixedColor;
 
-if (colorValue == 'Ora') {
+if (colorSubstring.toLowerCase().includes("orange")) {
     fixedColor = 'Orange';
 }
-else if (colorValue == 'Yel') {
+else if (colorSubstring.toLowerCase().includes("yellow")) {
     fixedColor = 'Yellow';
 }
-else if (colorValue == 'Gre') {
+else if (colorSubstring.toLowerCase().includes("green")) {
     fixedColor = 'Green';
 }
-else if (colorValue == 'Blu') {
+else if (colorSubstring.toLowerCase().includes("blue")) {
     fixedColor = 'Blue';
 }
-else if (colorValue == 'Pur') {
+else if (colorSubstring.toLowerCase().includes("purple")) {
     fixedColor = 'Purple';
 }
-else if (colorValue == 'Pin') {
+else if (colorSubstring.toLowerCase().includes("pink")) {
     fixedColor = 'Pink';
 }
-else if (colorValue == 'Bla') {
+else if (colorSubstring.toLowerCase().includes("black")) {
     fixedColor = 'Black';
 }
-else if (colorValue == 'Whi') {
+else if (colorSubstring.toLowerCase().includes("white")) {
     fixedColor = 'White';
 }
-
-
-let fixedPattern;
-
-if (patternTypeValue == 'Sol') {
-    fixedPattern = 'Solid';
+else if (colorSubstring.toLowerCase().includes("brown")) {
+    fixedColor = "Brown";
 }
-else if (patternTypeValue == 'Hou') {
-    fixedPattern = 'Houndstooth';
+else {
+    fixedColor = "";
 }
-else if (patternTypeValue == 'Pla') {
-    fixedPattern = 'Solid';
-}
-else if (patternTypeValue == 'Col') {
-    fixedPattern = 'Colorblock';
-}
-else if (patternTypeValue == 'Dit') {
-    fixedPattern = 'Floral';
-}
+console.log(fixedColor); // always gives the 1st if statement color rn
 
+// let fixedPattern;
 
-let fixedSleeveLength;
-if (descriptionStr.indexOf('"attr_name":"Sleeve Length"') != -1) {
-    if (sleeveLengthValue == 'Lon') {
-        fixedSleeveLength = 'Long%20Sleeve';
-    }
-    else if (sleeveLengthValue == 'Sho') {
-        fixedSleeveLength = 'Short%20Sleeve';
-    }
-    else if (sleeveLengthValue == 'Thr') {
-        fixedSleeveLength = '3-4%20Sleeve';
-    }
-    else if (sleeveLengthValue == 'Hal') {
-        fixedSleeveLength = '3-4%20Sleeve';
-    }
-    else if (sleeveLengthValue == 'Cap') {
-        fixedSleeveLength = 'Short%20Sleeve';
-    }
-    else if (sleeveLengthValue == 'Sle') {
-        fixedSleeveLength = 'Sleeveless';
-    }
-}
+// if (patternTypeValue == 'Sol') {
+//     fixedPattern = 'Solid';
+// }
+// else if (patternTypeValue == 'Hou') {
+//     fixedPattern = 'Houndstooth';
+// }
+// else if (patternTypeValue == 'Pla') {
+//     fixedPattern = 'Solid';
+// }
+// else if (patternTypeValue == 'Col') {
+//     fixedPattern = 'Colorblock';
+// }
+// else if (patternTypeValue == 'Dit') {
+//     fixedPattern = 'Floral';
+// }
+// console.log(fixedPattern); //undefined
 
+// let fixedSleeveLength;
+// if (descriptionStr.indexOf('"attr_name":"Sleeve Length"') != -1) {
+//     if (sleeveLengthValue == 'Lon') {
+//         fixedSleeveLength = 'Long%20Sleeve';
+//     }
+//     else if (sleeveLengthValue == 'Sho') {
+//         fixedSleeveLength = 'Short%20Sleeve';
+//     }
+//     else if (sleeveLengthValue == 'Thr') {
+//         fixedSleeveLength = '3-4%20Sleeve';
+//     }
+//     else if (sleeveLengthValue == 'Hal') {
+//         fixedSleeveLength = '3-4%20Sleeve';
+//     }
+//     else if (sleeveLengthValue == 'Cap') {
+//         fixedSleeveLength = 'Short%20Sleeve';
+//     }
+//     else if (sleeveLengthValue == 'Sle') {
+//         fixedSleeveLength = 'Sleeveless';
+//     }
+// }
+// console.log(fixedSleeveLength); // undefined
 
 let thredUrl;
 
-if (fixedCategory == 'Tops') {
+if (fixedCategory.toLowerCase().includes('top')) {
     thredUrl = 'https://www.thredup.com/women/tops?department_tags=women&category_tags=tops';
 }
-else if (fixedCategory == 'Dresses') {
+else if (fixedCategory.toLowerCase().includes('dresses')) {
     thredUrl = 'https://www.thredup.com/women/dresses?department_tags=women&category_tags=dresses';
 }
-else if (fixedCategory == 'Coats & Jackets') {
+else if (fixedCategory.toLowerCase().includes('coats') || fixedCategory.toLowerCase().includes('jackets')) {
     thredUrl = 'https://www.thredup.com/women/outerwear?department_tags=women&category_tags=outerwear';
 }
-else if (fixedCategory == 'Activewear') {
+else if (fixedCategory.toLowerCase().includes('activewear')) {
     thredUrl = 'https://www.thredup.com/women/activewear?department_tags=women&category_tags=activewear';
 }
-else if (fixedCategory == 'Swimwear') {
+else if (fixedCategory.toLowerCase().includes('swimwear')) {
     thredUrl = 'https://www.thredup.com/women/swimwear?department_tags=women&category_tags=swimwear';
 }
-else if (fixedCategory == 'Handbags') {
+else if (fixedCategory.toLowerCase().includes('handbags')) {
     thredUrl = 'https://www.thredup.com/handbags?department_tags=handbags';
 }
-else if (fixedCategory == 'Accessories') {
+else if (fixedCategory.toLowerCase().includes('accessories')) {
     thredUrl = 'https://www.thredup.com/accessories?department_tags=accessories';
 }
-else if (fixedCategory == 'Shoes') {
+else if (fixedCategory.toLowerCase().includes('shoes')) {
     thredUrl = 'https://www.thredup.com/shoes?department_tags=shoes';
 }
-
-
-if (fixedCategory == 'Tops') {
-    thredUrl = thredUrl + '&color_names=' + fixedColor + '&chars_pattern=' + fixedPattern + '&chars_sleeve_length=' + fixedSleeveLength;
+else if (fixedCategory.toLowerCase().includes('pants')) {
+    thredUrl = 'https://www.thredup.com/women/pants?department_tags=women&category_tags=pants';
 }
 else {
-    thredUrl = thredUrl + '&color_names=' + fixedColor + '&chars_pattern=' + fixedPattern;
+    thredUrl = 'https://www.thredUp.com/women/'
+}
+
+
+if (fixedCategory.toLowerCase().includes('tops') && fixedColor != "") {
+    thredUrl = thredUrl + '&color_names=' + fixedColor;
+    // + '&chars_pattern=' + fixedPattern + '&chars_sleeve_length=' + fixedSleeveLength;
+}
+else if (fixedCategory == "" || fixedColor == "") {
+    thredUrl = thredUrl;
+}
+else {
+    thredUrl = thredUrl + '&color_names=' + fixedColor;
+    //+ '&chars_pattern=' + fixedPattern;
 }
 //window.open(thredUrl);
 return thredUrl;

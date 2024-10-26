@@ -4,12 +4,11 @@ let storedPageSource = "";
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "storePageSource") {
     storedPageSource = message.source;
-    //console.log("Page source stored:", storedPageSource);
   } else if (message.action === "getPageSource") {
     sendResponse({ source: storedPageSource });
   }
-  return true; // Keeps the message channel open
 });
+
 
 chrome.action.onClicked.addListener((tab) => {
     chrome.scripting.executeScript({
@@ -17,4 +16,3 @@ chrome.action.onClicked.addListener((tab) => {
       files: ["content.js"]
     });
   });
-  

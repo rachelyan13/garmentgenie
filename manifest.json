@@ -6,7 +6,8 @@
     "manifest_version": 3,
     "action": {
         "default_icon": "icon.png",
-        "default_popup": "popup.html"
+        "default_popup": "popup.html",
+        "default_title": "Garment Genie"
     },
     "permissions": ["activeTab", "tabs", "scripting"],
 
@@ -17,10 +18,10 @@
 
       "content_scripts": [
         {
-          "matches": ["*://*.shein.com/*", "*://*.thredup.com/*"],
+          "matches": ["*://*.shein.com/*"],
           "js": ["content.js"]
         }
-    ],
+      ],
 
     "background": {
         "service_worker": "background.js"
