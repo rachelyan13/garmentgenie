@@ -1,19 +1,39 @@
 //TERMINAL COMMAND TO VIEW TERMINAL HISTORY IS: npm install -g yo generator-code
-const axios = require("axios");
+import { get } from "axios";
 
-(async() => {
-    chrome.tabs.query({active: true, currentWindow: true}, async tabs => {
-        let url = tabs[0].url;
-        // use url here inside the callback because it's asynchronous!
-        if (url.substring(0, 15) == 'https://us.shein.com/') {
-            const page = await axios.get(url);
-            const data = page.data;
-            console.log(data);
-            data.then((response) => {console.log('Received response: ${response.status}')});
-            console.log("HALLOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOJSDOFJAEIOGHAOEWUIAGHIEOHGOIEWUGAHOEIUGAHOEIGAOIGAOISUDFHAOIUEEHOWIFUAHEWO");
+
+(async () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+        const url = tabs[0].url;
+
+        if (url.includes('shein.com')) {
+            try {
+                const response = await fetch(url);
+                console.log('Received response:', response.status);
+                // Further logic for handling SHEIN-specific scraping would go here
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
         }
     });
-}) ();
+})();
+
+
+
+// (async() => {
+//     chrome.tabs.query({active: true, currentWindow: true}, async tabs => {
+//         let url = tabs[0].url;
+//         // use url here inside the callback because it's asynchronous!
+//         if (url.substring(0, 15) == 'https://us.shein.com/') {
+//             const response = await get(url);
+//             console.log('Received response:', response.status);
+//             // const page = await get(url);
+//             // const data = page.data;
+//             // console.log(data);
+//             // data.then((response) => {console.log('Received response: ${response.status}')});
+//         }
+//     });
+// }) ();
 
 
 //get url IF the website is SHEIN.com/ something
@@ -68,13 +88,9 @@ let detailsValue = detailsSubstring.substring(120, 123);
 */
 
 
-//let titleStr = '<title>Solid Zip Up Drawstring Thermal Lined Hoodie | SHEIN USA</title>';
-//let titleStr = '<title>Knit Lace-up Front Sock Sneakers | SHEIN USA</title>';
-
-
-let titleStart = titleStr.indexOf('<title>') + 7;
-let titleEnd = titleStr.indexOf(' | SHEIN USA</title>')
-let titleSubstring = titleStr.substring(titleStart, titleEnd);
+let titleStart = data.indexOf('<title>') + 7;
+let titleEnd = data.indexOf('</title>')
+let titleSubstring = data.substring(titleStart, titleEnd);
 
 
 const categories = ['Hoodie', 'Top', 'Dress', 'Coat', 'Jacket', 'Leggings', 'Sports Bra', 'Swimsuit', 'Coverup', 'Cover Up', 'Clutch', 'Tote', 'Purse', 'Handbag', 'Necklace', 'Earring', 'Ring', 'Headband', 'Belt', 'Heels', 'Sneakers', 'Boots', 'Pumps', 'Sandals', 'Tank Top', 'Sweatshirt', 'T-shirt', 'Tee', 'Sweaters', 'Jeans', 'Pants', 'Skirt', 'Shorts', 'Accessory'];
@@ -85,7 +101,7 @@ let categorySearch;
 let i = 0;
 
 while (categories[i]) {
-    categorySearch = titleStr.search(categories[i]);
+    categorySearch = titleSubstring.search(categories[i]);
     if (categorySearch != -1) {
         category = categories[i];
     }
