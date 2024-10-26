@@ -2,13 +2,15 @@
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     let url = tabs[0].url;
   
-    if (url.includes("shein.com")) {
+    if (url.includes("shein.com") && url.includes("img")) {
         // Delay requesting the page source by 200 milliseconds
         setTimeout(() => {
             chrome.runtime.sendMessage({ action: "getPageSource" }, (response) => {
                 if (response && response.source) {
                     let data = response.source;
                     let thredUpUrl = recommendationLogic(data);
+                    chrome.runtime.sendMessage({ action: "openPopup" });
+
                     document.getElementById("recommendation").innerHTML = 
                       `<a href="${thredUpUrl}" target="_blank">Check out similar items on ThredUp!</a>`;
                 } else {
@@ -79,7 +81,7 @@ let titleSubstring = data.substring(titleStart, titleEnd);
 
 console.log(titleSubstring); // works; SHEIN EZwear Solid Kangaroo Pocket Thermal Lined Hoodie | SHEIN USA
 
-const categories = ['Hoodie', 'Top', 'Dress', 'Coat', 'Jacket', 'Leggings', 'Sports Bra', 'Swimsuit', 'Coverup', 'Cover Up', 'Clutch', 'Tote', 'Purse', 'Handbag', 'Necklace', 'Earring', 'Ring', 'Bracelet', 'Headband', 'Belt', 'Heels', 'Sneakers', 'Boots', 'Pumps', 'Sandals', 'Tank Top', 'Sweatshirt', 'T-shirt', 'Tee', 'Sweaters', 'Jeans', 'Pants', 'Skirt', 'Shorts', 'Accessory'];
+const categories = ['Hoodie', 'Top', 'Dress', 'Coat', 'Jacket', 'Leggings', 'Sports Bra', 'Swimsuit', 'Coverup', 'Cover Up', 'Clutch', 'Tote', 'Purse', 'Handbag', 'Necklace', 'Earring', 'Ring', 'Bracelet', 'Headband', 'Belt', 'Heels', 'Sneakers', 'Boots', 'Pumps', 'Sandals', 'Tank Top', 'Sweatshirt', 'T-shirt', 'T-Shirt', 'Tee', 'Sweaters', 'Jeans', 'Pants', 'Skirt', 'Shorts', 'Accessory'];
 
 let category;
 
@@ -135,31 +137,37 @@ console.log(fixedCategory); // works
 let fixedColor;
 
 if (colorSubstring.toLowerCase().includes("orange")) {
-    fixedColor = 'Orange';
+    fixedColor = 'orange';
+}
+else if (colorSubstring.toLowerCase().includes('red')) {
+    fixedColor = 'red';
 }
 else if (colorSubstring.toLowerCase().includes("yellow")) {
-    fixedColor = 'Yellow';
+    fixedColor = 'yellow';
 }
 else if (colorSubstring.toLowerCase().includes("green")) {
-    fixedColor = 'Green';
+    fixedColor = 'green';
 }
 else if (colorSubstring.toLowerCase().includes("blue")) {
-    fixedColor = 'Blue';
+    fixedColor = 'blue';
 }
 else if (colorSubstring.toLowerCase().includes("purple")) {
-    fixedColor = 'Purple';
+    fixedColor = 'purple';
 }
 else if (colorSubstring.toLowerCase().includes("pink")) {
-    fixedColor = 'Pink';
+    fixedColor = 'pink';
 }
 else if (colorSubstring.toLowerCase().includes("black")) {
-    fixedColor = 'Black';
+    fixedColor = 'black';
 }
 else if (colorSubstring.toLowerCase().includes("white")) {
-    fixedColor = 'White';
+    fixedColor = 'white';
 }
 else if (colorSubstring.toLowerCase().includes("brown")) {
-    fixedColor = "Brown";
+    fixedColor = "brown";
+}
+else if (colorSubstring.toLowerCase().includes("grey") || colorSubstring.toLowerCase().includes("gray")) {
+    fixedColor = "grey";
 }
 else {
     fixedColor = "";

@@ -1,6 +1,6 @@
 {
-    "name": "Garment Genie",
-    "description": "Recommends cheaper & sustainable clothing alternatives from thredUp for SheIn shoppers.",
+    "name": "Garment Genie | Sustainable SheIn Alternative Clothing Recommendations",
+    "description": "Automatically recommends alternatives to SheIn products on thredUp.",
     "author": "Rachel Y.",
     "version": "0.0.1",
     "manifest_version": 3,
@@ -9,7 +9,7 @@
         "default_popup": "popup.html",
         "default_title": "Garment Genie"
     },
-    "permissions": ["activeTab", "tabs", "scripting"],
+    "permissions": ["activeTab", "tabs", "scripting", "windows"],
 
     "host_permissions": [
         "https://us.shein.com/*",
