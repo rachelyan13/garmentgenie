@@ -6,7 +6,6 @@
   "manifest_version": 3,
   "action": {
     "default_icon": "icon.png",
-    "default_popup": "popup.html",
     "default_title": "Garment Genie"
   },
   "icons": {
