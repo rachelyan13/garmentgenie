@@ -14,9 +14,6 @@
     "128": "icon.png"
   },
   "permissions": [
-    "activeTab",
-    "tabs",
-    "scripting",
     "windows",
     "notifications",
     "storage"
